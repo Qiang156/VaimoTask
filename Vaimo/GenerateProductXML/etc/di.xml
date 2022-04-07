@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2009-2016 Vaimo Group. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <preference for="Vaimo\GenerateProductXML\Model\ReaderInterface" type="Vaimo\GenerateProductXML\Model\Reader" />
+    <preference for="Vaimo\GenerateProductXML\Model\WriterInterface" type="Vaimo\GenerateProductXML\Model\Writer" />
+    <preference for="Vaimo\GenerateProductXML\Model\ConvertInterface" type="Vaimo\GenerateProductXML\Model\Convert" />
+
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="generateProductXML" xsi:type="object">Vaimo\GenerateProductXML\Console\generateCommand</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Vaimo\GenerateProductXML\Model\Logger\Handler">
+        <arguments>
+            <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
+        </arguments>
+    </type>
+    <type name="Vaimo\GenerateProductXML\Model\Logger\CustomLogger">
+        <arguments>
+            <argument name="name" xsi:type="string">product_generate_logger</argument>
+            <argument name="handlers" xsi:type="array">
+                <item name="product_generate_logger" xsi:type="object">Vaimo\GenerateProductXML\Model\Logger\Handler</item>
+            </argument>
+        </arguments>
+    </type>
+</config>
