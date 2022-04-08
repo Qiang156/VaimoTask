@@ -30,6 +30,7 @@ class Reader implements ReaderInterface
      * @var string[]
      */
     private $condition = ['brand'=>'maybelline'];
+    //private $condition = ['brand'=>'pure anada'];
 
     public function __construct() {
         $this->client = new Client([

@@ -8,6 +8,8 @@ namespace Vaimo\GenerateProductXML\Model;
 
 
 use Vaimo\GenerateProductXML\Model\Logger\CustomLogger;
+use GuzzleHttp\Client;
+use Vaimo\MenuLib\Exception;
 
 class Writer implements WriterInterface
 {
@@ -16,7 +18,7 @@ class Writer implements WriterInterface
 
     const LAYOUT = "<?xml version='1.0' encoding='utf-8'?><integrationbase></integrationbase>";
 
-    const MAX_ITEMS_PER_FILE = 10;
+    const MAX_ITEMS_PER_FILE = 100;
 
     protected $xml;
 
@@ -24,6 +26,13 @@ class Writer implements WriterInterface
     private $objectManager;
     private $convert;
     private $imagick;
+    private $client;
+
+    // these attributes should be under product node
+    private $priamryAttribute = [
+        'sku','name','visibility','status','reset_website_ids','categories',
+        'links','images','docs'
+    ];
 
     public function __construct(
         \Magento\Framework\ObjectManagerInterface $objectManager,
@@ -34,6 +43,7 @@ class Writer implements WriterInterface
         $this->convert = $convert;
         $this->logger = $logger;
         $this->imagick = new \Imagick();
+        $this->client = new Client(['timeout'=>30]);
     }
 
     /**
@@ -43,47 +53,42 @@ class Writer implements WriterInterface
     private function generate($node, array $product)
     {
         $item = $node->addChild('product','');
+
+        $attribute = $item->addChild('attributes','');
+        $attribute->addAttribute('store','admin');
+
+        $attribute_list = $item->addChild('attributes_list','')->addChild('attributes');
+        $xmlNode = [$item, $attribute, $attribute_list];
         foreach ($product as $key => $value) {
-            switch ($key) {
-                case 'category':
-                    $this->handleCategory($item, $value);
-                    break;
-                case 'images':
-                    $this->handleImages($item, $value);
-                    break;
-                case 'colors':
-                    $this->handleColor($item, $value);
-                    break;
-                case 'tags':
-                    $this->handleTags($item, $value);
-                    break;
-                default:
-                    $this->handleItem($item, $key, $value);
-            }
+            $funcArr = \explode(' ', ucwords(str_replace('_',' ',$key)));
+            $function = 'handle'.\join('',$funcArr);
+            $this->{$function}($xmlNode, $key, $value);
         }
         return $this;
     }
 
     /**
-     * @param $node
-     * @param $category
+     * @param array $node
+     * @param string $key
+     * @param string $category
      * @return bool
      */
-    private function handleCategory($node, $category)
+    private function handleCategory(array $node, string $key, string $category)
     {
-        $tmp = $node->addChild('categories','')->addChild('category',htmlspecialchars($category));
+        $tmp = $node[0]->addChild('categories','')->addChild('category',htmlspecialchars($category));
         $tmp->addAttribute('root', 'Default Category');
         return true;
     }
 
     /**
-     * @param $node
-     * @param $items
+     * @param array $node
+     * @param string $key
+     * @param array $items
      * @return bool
      */
-    private function handleColor($node, $items)
+    private function handleColors(array $node, string $key, array $items)
     {
-        $tmp = $node->addchild('colors','');
+        $tmp = $node[2]->addchild('colors','');
         foreach($items as $item) {
             $tmp1 = $tmp->addChild('color','');
             foreach($item as $key => $value) {
@@ -94,42 +99,61 @@ class Writer implements WriterInterface
     }
 
     /**
-     * @param $node
-     * @param $items
+     * @param array $node
+     * @param string $key
+     * @param array $items
      * @return bool
      */
-    private function handleTags($node, $items)
+    private function handleTags(array $node, string $key, array $items)
     {
-        $tmp = $node->addchild('tags','');
-        foreach($items as $item) {
-            $tmp->addChild('tag',htmlspecialchars($item));
-        }
+        array_walk($items, function($item) {
+            $item = htmlspecialchars($item);
+        });
+        $node[1]->addchild('tags',\join(',',$items));
         return true;
     }
 
     /**
-     * @param $node
-     * @param $items
+     * @param array $node
+     * @param string $key
+     * @param string $value
      * @return bool
      */
-    private function handleImages($node, $value)
+    private function handleImages(array $node, string $key, string $value)
     {
-        $tmp = $node->addchild('images','');
+        $tmp = $node[0]->addchild('images','');
         $tmp->addChild('image',htmlspecialchars($value));
         return true;
     }
 
     /**
-     * @param $node
-     * @param $key
-     * @param $value
+     * @param array $node
+     * @param string $key
+     * @param string|null $value
      * @return bool
      */
-    private function handleItem($node, $key, $value)
+    private function handleItem(array $node, string $key, $value)
     {
         $value = htmlspecialchars(trim($value));
-        $node->addChild($key, $value);
+        if( in_array($key, $this->priamryAttribute) ) {
+            $node[0]->addChild($key, $value);
+        } else {
+            $node[1]->addChild($key, $value);
+        }
         return true;
+    }
+
+    /**
+     * @param $method
+     * @param $args
+     * @return bool
+     */
+    public function __call($method, $args)
+    {
+        if( !method_exists($this, $method) ) {
+            $method = 'handleItem';
+        }
+        return $this->{$method}($args[0],$args[1],$args[2]);
     }
 
     /**
@@ -158,21 +182,26 @@ class Writer implements WriterInterface
 
     /**
      * @param array $product
-     * @param string $imagefile
+     * @param string $imagePath
      * @return bool
-     * @throws \ImagickException
      */
-    private function writeImage( array $product, string $path )
+    private function writeImage(array $product, string $imagePath )
     {
         try {
-            $info = $this->getImageInfo($product['images']);
-            if( strpos(\Vaimo\ImageBinder\Model\Reader::FILE_PATTERN, $info['suffix'] ) === false ) {
-                return false;
+            $res = $this->client->get($product['images']);
+            if( $res->getStatusCode() == 200) {
+                list($imgType, $imgSuffix) = explode('/',$res->getHeader('content-type')[0]);
+                if($imgType == 'image') {
+                    $info = $this->getImageInfo($res->getBody());
+                    if (empty($info) || strpos(\Vaimo\ImageBinder\Model\Reader::FILE_PATTERN, $info['suffix']) === false) {
+                        return false;
+                    }
+                    $this->imagick->writeImage($imagePath.DIRECTORY_SEPARATOR.$product['sku'].'.'.$info['suffix']);
+                    $this->imagick->clear();
+                }
             }
-            $this->imagick->writeImage($path.'/'.$product['sku'].'.'.$info['suffix']);
-            $this->imagick->clear();
-        } catch(\Exception $e) {
-            $this->logger($e->getMessage());
+        } catch (\Exception $e) {
+            $this->logger->addInfo($e->getMessage());
             return false;
         }
         return true;
@@ -207,15 +236,16 @@ class Writer implements WriterInterface
      * @param $imageLink
      * @return string
      */
-    private function getImageInfo($imageLink)
+    private function getImageInfo($image)
     {
         $info = [];
-        $this->imagick->readImage($imageLink);
-        $info['suffix'] = strtolower( $this->imagick->getImageFormat() );
-        $info['size'] = $this->imagick->getSize();
-        $info['mimeType'] = $this->imagick->getImageMimeType();
-        $info['width'] = $this->imagick->getImageWidth();
-        $info['height'] = $this->imagick->getImageHeight();
+        if( $this->imagick->readImageBlob($image) ) {
+            $info['suffix'] = strtolower($this->imagick->getImageFormat());
+            $info['size'] = $this->imagick->getSize();
+            $info['mimeType'] = $this->imagick->getImageMimeType();
+            $info['width'] = $this->imagick->getImageWidth();
+            $info['height'] = $this->imagick->getImageHeight();
+        }
         return $info;
     }
 

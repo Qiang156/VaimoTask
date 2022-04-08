@@ -48,7 +48,7 @@ class Product
      */
     public function execute($output)
     {
-        $this->logger->addInfo(__("Reading images..."));
+        $this->logger->addInfo(__("Reading products..."));
         $start = microtime(true);
         $results = $this->reader->read();
 

@@ -39,7 +39,7 @@ class generateCommand extends AbstractCommand
     {
         $message = '<comment>%s</comment>';
         $output->writeln(sprintf($message,'Generating product files...'));
-
+        //TODO accept some words as filter for Reader class
         $product = $this->getObjectManager()->get('Vaimo\GenerateProductXML\Model\Product');
         $product->execute($output);
 
