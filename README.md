@@ -12,6 +12,7 @@ since 2022-04-07
 - Image named 1048.jpg
 
 > 
+> ---
 > Phase 1 [**Done**]
 > - bin/magento product:xml:generate --filter="brand=maybelline"
 > - bin/magento integration:job:run transport_product_import
