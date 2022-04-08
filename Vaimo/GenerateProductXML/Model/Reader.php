@@ -29,8 +29,10 @@ class Reader implements ReaderInterface
      * Conditions
      * @var string[]
      */
-    private $condition = ['brand'=>'maybelline'];
+    private $condition = [];
+    //private $condition = ['brand'=>'maybelline'];
     //private $condition = ['brand'=>'pure anada'];
+
 
     public function __construct() {
         $this->client = new Client([
@@ -59,8 +61,15 @@ class Reader implements ReaderInterface
      * @return array
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function read()
+    public function read(string $filter)
     {
+        if($filter != '') {
+            $filterArr = explode(';',$filter);
+            array_walk($filterArr, function($item) {
+                list($key, $val) = explode('=', $item);
+                $this->addFilter([$key=>$val]);
+            }, $this);
+        }
         $data = [];
         try {
             $query_uri = 'products.json?'.http_build_query($this->condition,'','&');
