@@ -11,6 +11,14 @@ since 2022-04-7
 • Use id as sku
 • Image named 1048.jpg
 
+> ---
+> Phase 1 [**Done**]
+> - bin/magento product:xml:generate --filter="brand=maybelline"
+> - bin/magento integration:job:run transport_product_import
+> - bin/magento integration:job:run process_product_import
+> - bin/magento imagebinder:run
+> ---
+
 ### Phase 2
 • Find out how to import configurable products
 • Setup script to add color_name, color_hex attributes
