@@ -13,11 +13,11 @@ since 2022-04-07
 
 > 
 > Phase 1 [**Done**]
-- bin/magento product:xml:generate --filter="brand=maybelline"
-- bin/magento integration:job:run transport_product_import
-- bin/magento integration:job:run process_product_import
-- bin/magento imagebinder:run
-- bin/magento index:reindex
+> - bin/magento product:xml:generate --filter="brand=maybelline"
+> - bin/magento integration:job:run transport_product_import
+> - bin/magento integration:job:run process_product_import
+> - bin/magento imagebinder:run
+> - bin/magento index:reindex
 > ---
 
 ### Phase 2
