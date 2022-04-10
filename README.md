@@ -1,5 +1,5 @@
 # VaimoTask
-since 2022-04-07
+Since 2022-04-07
 
 ---
 ### Phase 1
@@ -27,6 +27,18 @@ since 2022-04-07
 - Create xml with configurable products and color simple products
 - Use id + hex as sku (1048-B28378)
 - Image named 1048-B28378.jpg with a color border/box https://www.php.net/manual/en/function.imagerectangle.php
+
+>
+> ---
+> Phase 2 **processing**
+> - Information from vaimo confluence
+> > - Configurable products must come AFTER it's simple products in the import file
+> > - The parent_sku attribute must include a configurable products SKU, in case it should be a child
+> > - Alternatively, configurable product may contain comma-separated list of all child SKUs listed in the child_products node.
+> - For child product, need to put them in front of their parent product with parent_sku tag with their parent's sku and type tag with virtual string.
+> - For parent product, should write with type tag with configurable and configurable_attributes tag with specific options. 
+> ---
+
 
 ### Phase 3
 - Minor frontend changes, like a banner, remove unwanted functions, add some colors etc

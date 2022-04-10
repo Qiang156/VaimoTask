@@ -15,6 +15,6 @@ interface ReaderInterface
      * Read images and parse them to array
      * @return array
      */
-    public function read(string $filter);
+    public function read(array $argv);
 
 }

@@ -27,11 +27,17 @@ class generateCommand extends AbstractCommand
         $options = [
             new InputOption(
                 'filter',
-                null,
+                'f',
                 InputOption::VALUE_OPTIONAL,
                 "Multiple filter strings should be seperated by ;\r\n".
                 "More paramters see http://makeup-api.herokuapp.com/"
-            )
+            ),
+            new InputOption(
+                'numbers',
+                't',
+                InputOption::VALUE_OPTIONAL,
+                "Maximum records to be picked up"
+            ),
         ];
         $this->setName(self::COMMAND_RUN);
         $this->setDefinition($options);
@@ -49,11 +55,14 @@ class generateCommand extends AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $filter = trim($input->getOption('filter'));
+        $numbers = (int) $input->getOption('numbers');
+        $argv = ['filter'=>$filter, 'numbers'=>$numbers];
+
         $message = '<comment>%s</comment>';
         $output->writeln(sprintf($message,'Generating product files...'));
         //TODO accept some words as filter for Reader class
         $product = $this->getObjectManager()->get('Vaimo\GenerateProductXML\Model\Product');
-        $product->execute($output, $filter);
+        $product->execute($output, $argv);
 
         $output->writeln(sprintf($message,'Done'));
         return true;

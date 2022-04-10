@@ -9,7 +9,6 @@ namespace Vaimo\GenerateProductXML\Model;
 
 use Vaimo\GenerateProductXML\Model\Logger\CustomLogger;
 use GuzzleHttp\Client;
-use Vaimo\MenuLib\Exception;
 
 class Writer implements WriterInterface
 {
@@ -30,8 +29,12 @@ class Writer implements WriterInterface
 
     // these attributes should be under product node
     private $priamryAttribute = [
-        'sku','name','visibility','status','reset_website_ids','categories',
+        'sku','name','visibility','status','category','reset_website_ids',
         'links','images','docs'
+    ];
+    // there attributes should be under product > attribute_list
+    private $attributeList = [
+        'tags'
     ];
 
     public function __construct(
@@ -53,42 +56,59 @@ class Writer implements WriterInterface
     private function generate($node, array $product)
     {
         $item = $node->addChild('product','');
+        //for the xml file has pretty format.
+        foreach($this->priamryAttribute as $key) {
+            if( isset($product[$key]) ) {
+                $funcArr = \explode(' ', ucwords(str_replace('_',' ',$key)));
+                $function = 'handle'.\join('',$funcArr);
+                $this->{$function}($item, $key, $product[$key]);
+                unset($product[$key]);
+            } else {
+                $item->addChild($key,'');
+            }
+        }
 
         $attribute = $item->addChild('attributes','');
         $attribute->addAttribute('store','admin');
+        foreach ($product as $key => $value) {
+            if( in_array($key,$this->attributeList) ) continue;
+            $funcArr = \explode(' ', ucwords(str_replace('_',' ',$key)));
+            $function = 'handle'.\join('',$funcArr);
+            $this->{$function}($attribute, $key, $value);
+            unset($product[$key]);
+        }
 
         $attribute_list = $item->addChild('attributes_list','')->addChild('attributes');
-        $xmlNode = [$item, $attribute, $attribute_list];
         foreach ($product as $key => $value) {
             $funcArr = \explode(' ', ucwords(str_replace('_',' ',$key)));
             $function = 'handle'.\join('',$funcArr);
-            $this->{$function}($xmlNode, $key, $value);
+            $this->{$function}($attribute_list, $key, $value);
         }
         return $this;
     }
 
     /**
-     * @param array $node
+     * @param $node
      * @param string $key
      * @param string $category
      * @return bool
      */
-    private function handleCategory(array $node, string $key, string $category)
+    private function handleCategory($node, string $key, string $category)
     {
-        $tmp = $node[0]->addChild('categories','')->addChild('category',htmlspecialchars($category));
+        $tmp = $node->addChild('categories','')->addChild('category',htmlspecialchars($category));
         $tmp->addAttribute('root', 'Default Category');
         return true;
     }
 
     /**
-     * @param array $node
+     * @param $node
      * @param string $key
      * @param array $items
      * @return bool
      */
-    private function handleColors(array $node, string $key, array $items)
+    private function handleColors($node, string $key, array $items)
     {
-        $tmp = $node[2]->addchild('colors','');
+        $tmp = $node->addchild('colors','');
         foreach($items as $item) {
             $tmp1 = $tmp->addChild('color','');
             foreach($item as $key => $value) {
@@ -99,47 +119,43 @@ class Writer implements WriterInterface
     }
 
     /**
-     * @param array $node
+     * @param $node
      * @param string $key
      * @param array $items
      * @return bool
      */
-    private function handleTags(array $node, string $key, array $items)
+    private function handleTags($node, string $key, array $items)
     {
         array_walk($items, function($item) {
             $item = htmlspecialchars($item);
         });
-        $node[1]->addchild('tags',\join(',',$items));
+        $node->addchild('tags',\join(',',$items));
         return true;
     }
 
     /**
-     * @param array $node
+     * @param $node
      * @param string $key
      * @param string $value
      * @return bool
      */
-    private function handleImages(array $node, string $key, string $value)
+    private function handleImages($node, string $key, string $value)
     {
-        $tmp = $node[0]->addchild('images','');
+        $tmp = $node->addchild('images','');
         $tmp->addChild('image',htmlspecialchars($value));
         return true;
     }
 
     /**
-     * @param array $node
+     * @param $node
      * @param string $key
      * @param string|null $value
      * @return bool
      */
-    private function handleItem(array $node, string $key, $value)
+    private function handleItem($node, string $key, $value)
     {
         $value = htmlspecialchars(trim($value));
-        if( in_array($key, $this->priamryAttribute) ) {
-            $node[0]->addChild($key, $value);
-        } else {
-            $node[1]->addChild($key, $value);
-        }
+        $node->addChild($key, $value);
         return true;
     }
 

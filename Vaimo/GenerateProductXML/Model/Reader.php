@@ -33,6 +33,12 @@ class Reader implements ReaderInterface
     //private $condition = ['brand'=>'maybelline'];
     //private $condition = ['brand'=>'pure anada'];
 
+    /**
+     * maximum records to pick up from the source data
+     * @var int 0->unlimited
+     */
+    private $maximum = 0;
+
 
     public function __construct() {
         $this->client = new Client([
@@ -42,16 +48,39 @@ class Reader implements ReaderInterface
     }
 
     /**
+     * @return int
+     */
+    public function getMaximum()
+    {
+        return $this->maximum;
+    }
+
+    /**
+     * @param $nums
+     * @return bool
+     */
+    public function setMaxinum($nums)
+    {
+        if($nums > 0) {
+            $this->maximum = $nums;
+        }
+        return true;
+    }
+
+    /**
      * http://makeup-api.herokuapp.com/
      * Add filter conditions
      * @param array $condition
      * @return $this
      */
-    public function addFilter(array $condition)
+    public function addFilter(string $filter)
     {
-        foreach ($condition as $key => $value) {
-            $this->condition[$key] = $value;
-        }
+        if( $filter == '') return $this;
+        $filterArr = explode(';',$filter);
+        array_walk($filterArr, function($item) {
+            list($key, $val) = explode('=', $item);
+            $this->condition[$key] = $val;
+        }, $this);
         return $this;
     }
 
@@ -61,14 +90,13 @@ class Reader implements ReaderInterface
      * @return array
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function read(string $filter)
+    public function read(array $argv)
     {
-        if($filter != '') {
-            $filterArr = explode(';',$filter);
-            array_walk($filterArr, function($item) {
-                list($key, $val) = explode('=', $item);
-                $this->addFilter([$key=>$val]);
-            }, $this);
+        if( isset($argv['filter']) ) {
+            $this->addFilter($argv['filter']);
+        }
+        if( isset($argv['numbers']) ) {
+            $this->setMaxinum($argv['numbers']);
         }
         $data = [];
         try {
@@ -80,6 +108,10 @@ class Reader implements ReaderInterface
         } catch ( GuzzleException $e ) {
             echo "GuzzleException Error: ".$e->getMessage();
             $this->client = null;
+        }
+        $pickNums = $this->getMaximum();
+        if( count($data) > $pickNums ) {
+            $data = array_slice($data,0, $pickNums);
         }
         return $this->addExtraItem($data);
     }

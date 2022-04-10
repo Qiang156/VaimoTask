@@ -46,11 +46,11 @@ class Product
     /**
      * @return void
      */
-    public function execute($output, string $filter)
+    public function execute($output, array $argv)
     {
         $this->logger->addInfo(__("Reading products..."));
         $start = microtime(true);
-        $results = $this->reader->read($filter);
+        $results = $this->reader->read($argv);
 
         $this->logger->addInfo(__("Finished reading products, took %1 seconds.", microtime(true) - $start));
         $this->logger->addInfo(__("%1 products found", count($results)));
