@@ -34,11 +34,18 @@ class Reader implements ReaderInterface
     //private $condition = ['brand'=>'pure anada'];
 
     /**
+     * ignore tags from the original data
+     * @var string[]
+     */
+    private $delete = [
+        'product_link','website_link','product_api_url','api_featured_image'
+    ];
+
+    /**
      * maximum records to pick up from the source data
      * @var int 0->unlimited
      */
     private $maximum = 0;
-
 
     public function __construct() {
         $this->client = new Client([
@@ -95,7 +102,7 @@ class Reader implements ReaderInterface
         if( isset($argv['filter']) ) {
             $this->addFilter($argv['filter']);
         }
-        if( isset($argv['numbers']) ) {
+        if( isset($argv['numbers']) && $argv['numbers'] > 0 ) {
             $this->setMaxinum($argv['numbers']);
         }
         $data = [];
@@ -110,25 +117,64 @@ class Reader implements ReaderInterface
             $this->client = null;
         }
         $pickNums = $this->getMaximum();
-        if( count($data) > $pickNums ) {
+        if( $pickNums > 0 && count($data) > $pickNums ) {
             $data = array_slice($data,0, $pickNums);
         }
-        return $this->addExtraItem($data);
+        return $this->addExtraItem($data, $argv);
     }
 
     /**
      * @param array $data
      * @return array
      */
-    public function addExtraItem(array $data)
+    public function addExtraItem(array $data, array $option)
     {
         foreach($data as $key => $item) {
+            foreach($item as $k => $v) {
+                if( !is_array($v) ) $data[$key][$k] = htmlspecialchars($v);
+            }
             $data[$key]['short_description'] = $item['description'];
             $data[$key]['status'] = 'enabled';
             $data[$key]['visibility'] = 'both';
             $data[$key]['reset_website_ids'] = 'true';
+
+            $colors = $this->handleColors($item);
+            $data[$key]['color_name'] = $colors['color_name'];
+            $data[$key]['color_hex'] = $colors['color_hex'];
+            unset($data[$key]['product_colors']);
+
+            if( !empty($data[$key][$option['attributes']]) && $option['type'] == 'configurable') {
+                $data[$key]['type'] = $option['type'];
+                $data[$key]['configurable_attributes'] = $option['attributes'];
+            }
+
+            foreach($this->delete as $keyword) {
+                if( isset($item[$keyword]) ) {
+                    unset($data[$key][$keyword]);
+                }
+            }
+
         }
         return $data;
+    }
+
+    /**
+     * @param $product
+     * @return void
+     */
+    private function handleColors($product)
+    {
+        $colors = [
+            'color_name'=>[],
+            'color_hex'=>[]
+        ];
+        if( isset($product['product_colors']) && !empty($product['product_colors']) ) {
+            foreach( $product['product_colors'] as $item ) {
+                $colors['color_name'][] = htmlspecialchars($item['colour_name']);
+                $colors['color_hex'][] = trim(strtoupper($item['hex_value']),'#');
+            }
+        }
+        return $colors;
     }
 
 }

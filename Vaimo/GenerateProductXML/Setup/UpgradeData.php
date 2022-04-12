@@ -77,6 +77,15 @@ class UpgradeData implements UpgradeDataInterface
                 'Tags' => 'tags',
             ]);
         }
+
+        if (version_compare($context->getVersion(), '1.0.1', '<')) {
+            $this->removeAttributes($setup, ['color_name','color_hex']);
+            $this->addSelectAttributes($setup, [
+                'Color Name' => 'color_name',
+                'Color Hex' => 'color_hex',
+            ]);
+        }
+
         $setup->endSetup();
     }
 
@@ -88,6 +97,19 @@ class UpgradeData implements UpgradeDataInterface
     {
         foreach ($textAttributes as $label => $code) {
             $this->createAttribute($setup, $code, $label, 'varchar', 'text', true, false, true, $group);
+        }
+    }
+
+    /**
+     * @param ModuleDataSetupInterface $setup
+     * @param $selectAttributes
+     * @param bool $isFilter
+     * @param string $group
+     */
+    private function addSelectAttributes($setup, $multiSelectAttributes, $isFilter = false, $group = 'Attributes')
+    {
+        foreach ($multiSelectAttributes as $label => $code) {
+            $this->createAttribute($setup, $code, $label, 'varchar', 'select', true, $isFilter, true, $group);
         }
     }
 

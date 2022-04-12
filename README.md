@@ -30,13 +30,14 @@ Since 2022-04-07
 
 >
 > ---
-> Phase 2 **processing**
+> Phase 2 **Done**
 > - Information from vaimo confluence
 > > - Configurable products must come AFTER it's simple products in the import file
 > > - The parent_sku attribute must include a configurable products SKU, in case it should be a child
 > > - Alternatively, configurable product may contain comma-separated list of all child SKUs listed in the child_products node.
 > - For child product, need to put them in front of their parent product with parent_sku tag with their parent's sku and type tag with virtual string.
 > - For parent product, should write with type tag with configurable and configurable_attributes tag with specific options. 
+> - bin/magento product:xml:generate -f brand=maybelline -t 100 configurable:color_hex
 > ---
 
 

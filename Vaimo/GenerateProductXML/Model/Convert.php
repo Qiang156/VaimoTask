@@ -20,18 +20,9 @@ class Convert implements ConvertInterface
      */
     private $maps = [
         'sku' => 'id',
-        'colors' => 'product_colors',
         'category' => 'brand',
         'tags' => 'tag_list',
         'images' => 'image_link'
-    ];
-
-    /**
-     * ignore tags from the original data
-     * @var string[]
-     */
-    private $delete = [
-        'product_link','website_link','product_api_url','api_featured_image'
     ];
 
     /**
@@ -72,11 +63,6 @@ class Convert implements ConvertInterface
                     $data[$key] = $data[$val];
                     unset($data[$val]);
                 }
-            }
-        }
-        foreach($this->delete as $key) {
-            if( isset($data[$key]) ) {
-                unset($data[$key]);
             }
         }
         return $data;
