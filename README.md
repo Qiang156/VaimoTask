@@ -44,6 +44,11 @@ Since 2022-04-07
 ### Phase 3
 - Minor frontend changes, like a banner, remove unwanted functions, add some colors etc
 
+> ---
+> Phase 3 [Done]
+> - created Banner
+> - modified Header block
+
 ---
 
 ### Phase 4
