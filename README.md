@@ -20,6 +20,8 @@ Since 2022-04-07
 > - bin/magento imagebinder:run
 > - bin/magento index:reindex
 > ---
+> - make colorname and color hex to show like swatches
+> ---
 
 ### Phase 2
 - Find out how to import configurable products
