@@ -8,6 +8,8 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
 
+<!--    <preference for="Magento\Swatches\Block\Product\Renderer\Configurable" type="Vaimo\GenerateProductXML\Block\Product\Renderer\Configurable" />-->
+
     <preference for="Vaimo\GenerateProductXML\Model\ReaderInterface" type="Vaimo\GenerateProductXML\Model\Reader" />
     <preference for="Vaimo\GenerateProductXML\Model\WriterInterface" type="Vaimo\GenerateProductXML\Model\Writer" />
     <preference for="Vaimo\GenerateProductXML\Model\ConvertInterface" type="Vaimo\GenerateProductXML\Model\Convert" />

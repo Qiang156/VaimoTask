@@ -94,56 +94,27 @@ class Writer implements WriterInterface
      */
     private function generateChild($node, $product)
     {
-        $data = [];
-        $attributes = explode(',',$product['configurable_attributes']);
-        foreach($attributes as $item) {
-            $data[] = $product[$item];
-        }
-        $children = $this->cartesianProduct($data);
-        foreach($children as $key => $sku) {
+        $children = [];
+        foreach($product['product_colors'] as $key => $color) {
+            $hex_value = strtoupper(trim($color['hex_value']));
+            if( strlen($hex_value) != 7 ) continue;
+            $color_name = $color['colour_name'] ?? trim($hex_value,'#');
 
-            $children[$key] = $product['sku'].'-'.$sku;
-
+            $children[$key] = $product['sku'].'-'.trim($hex_value,'#');
             $item = $node->addChild('product','');
-            $item->addChild('sku', $product['sku'].'-'.$sku);
-            $item->addChild('name', $product['name'].'-'.$sku);
+            $item->addChild('sku', $children[$key]);
+            $item->addChild('name', $product['name'].'-'.trim($hex_value,'#'));
             $item->addChild('visibility','none');
             $item->addChild('status', 'enabled');
-            $item->addChild('type', 'virtual');
             $item->addChild('parent_sku', $product['sku']);
 
             $attributesNode = $item->addChild('attributes','');
             $attributesNode->addAttribute('store','admin');
-            $skuarr = explode('-',$sku);
-            foreach($attributes as $key => $name) {
-                $attributesNode->addChild($name, $skuarr[$key]);
-            }
-            if( in_array('color_hex',$attributes) && isset($product['color_name'])) {
-                $attributesNode->addChild('color_name', $product['color_name'][$key]);
-            }
+            $attributesNode->addChild('color_name', trim($color_name));
+            $attributesNode->addChild('color_hex', $hex_value);
             $attributesNode->addChild('price', $product['price']);
         }
         return $children;
-    }
-
-    /**
-     *
-     * @param array $data
-     * @return array
-     */
-    private function cartesianProduct( array $data )
-    {
-        $result = \array_shift($data);
-        foreach($data as $items) {
-            $tmp = [];
-            foreach($result as $value) {
-                foreach($items as $item) {
-                    $tmp[] = $value."-".$item;
-                }
-            }
-            $result = $tmp;
-        }
-        return $result;
     }
 
     /**
@@ -252,18 +223,11 @@ class Writer implements WriterInterface
             foreach ($items as $product) {
                 $product = $this->convert->convert($product);
                 $childSku = [];
-                if(isset($product['type']) && $product['type'] == 'configurable') {
+                if(isset($product['product_colors']) && !empty($product['product_colors'])) {
                     $childSku = $this->generateChild($xmlObj, $product);
-                    unset($product['price']);
-                    $attributes = explode(',',$product['configurable_attributes']);
-                    foreach($attributes as $item) {
-                        unset($product[$item]);
-                    }
-                    if( in_array('color_hex',$attributes) ) {
-                        unset($product['color_name']);
-                    }
-                } else {
-                    unset($product['type']);
+                    unset($product['price'], $product['product_colors']);
+                    $product['type'] = 'configurable';
+                    $product['configurable_attributes'] = 'color_name';
                 }
                 $this->generate($xmlObj, $product);
                 $imagefile = $this->writeImage($product, $imagePath);

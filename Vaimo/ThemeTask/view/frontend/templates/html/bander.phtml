@@ -2,7 +2,9 @@
 /**
  * @var \Magento\Theme\Block\Html\Header $block
  */
-$message = $block->getSomething();
+?>
+<?php
+if( $block->isHomePage() ) {
 ?>
 <div id="theme_task_bander_wrap" data-mage-init='{"Vaimo_ThemeTask/js/theme_task_banner": {}}'>
     <div class="banner">
@@ -46,3 +48,5 @@ $message = $block->getSomething();
     <div class="prev"></div>
     <div class="next"></div>
 </div>
+<?php
+}

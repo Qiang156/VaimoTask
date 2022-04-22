@@ -28,10 +28,10 @@ class generateCommand extends AbstractCommand
         parent::configure();
         $this->setName(self::COMMAND_RUN);
         $this->setDescription('Generate product XML file for importing');
-        $this->addArgument(
-            'type', InputArgument::OPTIONAL,
-            'Which type of product need to be created,[simple/configurable:attribute]',
-            'simple');
+//        $this->addArgument(
+//            'type', InputArgument::OPTIONAL,
+//            'Which type of product need to be created,[simple/configurable:attribute]',
+//            'simple');
         $this->addOption(
             'filter',
             'f',
@@ -57,30 +57,30 @@ class generateCommand extends AbstractCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $type_list = ['simple','configurable','virtual','bundle'];
-        list($type, $attributes) = explode(':',$input->getArgument('type'));
-        if( !in_array($type, $type_list) ) {
-            $output->writeln(sprintf(
-                '<error>%s</error>',
-                'Argument type should be one of '.\join('/',$type_list).'...')
-            );
-            exit;
-        } else {
-            if($type == 'configurable') {
-                if($attributes == '') {
-                    $output->writeln(sprintf(
-                            '<error>%s</error>',
-                            'Argument attributes should not be empty...')
-                    );
-                    exit;
-                }
-            }
-        }
+//        $type_list = ['simple','configurable','virtual','bundle'];
+//        list($type, $attributes) = explode(':',$input->getArgument('type'));
+//        if( !in_array($type, $type_list) ) {
+//            $output->writeln(sprintf(
+//                '<error>%s</error>',
+//                'Argument type should be one of '.\join('/',$type_list).'...')
+//            );
+//            exit;
+//        } else {
+//            if($type == 'configurable') {
+//                if($attributes == '') {
+//                    $output->writeln(sprintf(
+//                            '<error>%s</error>',
+//                            'Argument attributes should not be empty...')
+//                    );
+//                    exit;
+//                }
+//            }
+//        }
         $message = '<comment>%s</comment>';
         $filter = trim($input->getOption('filter'));
         $numbers = (int) $input->getOption('numbers');
-        $argv = ['filter'=>$filter, 'numbers'=>$numbers,'type'=>$type, 'attributes'=>$attributes];
-
+//        $argv = ['filter'=>$filter, 'numbers'=>$numbers,'type'=>$type, 'attributes'=>$attributes];
+        $argv = ['filter'=>$filter, 'numbers'=>$numbers];
         $output->writeln(sprintf($message,'Generating product files...'));
 
         $product = $this->getObjectManager()->get('Vaimo\GenerateProductXML\Model\Product');

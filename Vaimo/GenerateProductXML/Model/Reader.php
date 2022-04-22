@@ -131,22 +131,22 @@ class Reader implements ReaderInterface
     {
         foreach($data as $key => $item) {
             foreach($item as $k => $v) {
-                if( !is_array($v) ) $data[$key][$k] = htmlspecialchars($v);
+                if( !is_array($v) ) $data[$key][$k] = htmlspecialchars(trim($v));
             }
             $data[$key]['short_description'] = $item['description'];
             $data[$key]['status'] = 'enabled';
             $data[$key]['visibility'] = 'both';
             $data[$key]['reset_website_ids'] = 'true';
 
-            $colors = $this->handleColors($item);
-            $data[$key]['color_name'] = $colors['color_name'];
-            $data[$key]['color_hex'] = $colors['color_hex'];
-            unset($data[$key]['product_colors']);
+//            $colors = $this->handleColors($item);
+//            $data[$key]['color_name'] = $colors['color_name'];
+//            $data[$key]['color_hex'] = $colors['color_hex'];
+//            unset($data[$key]['product_colors']);
 
-            if( !empty($data[$key][$option['attributes']]) && $option['type'] == 'configurable') {
-                $data[$key]['type'] = $option['type'];
-                $data[$key]['configurable_attributes'] = $option['attributes'];
-            }
+//            if( !empty($data[$key][$option['attributes']]) && $option['type'] == 'configurable') {
+//                $data[$key]['type'] = $option['type'];
+//                $data[$key]['configurable_attributes'] = $option['attributes'];
+//            }
 
             foreach($this->delete as $keyword) {
                 if( isset($item[$keyword]) ) {
