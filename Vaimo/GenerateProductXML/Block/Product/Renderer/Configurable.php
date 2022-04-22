@@ -27,8 +27,6 @@ class Configurable extends \Magento\Swatches\Block\Product\Renderer\Configurable
     const COLOR_NAME_ID = 244;
     const COLOR_NAME_CODE = 'color_name';
 
-    const COLOR_HEX_RENDERER_TEMPLATE = 'Vaimo_GenerateProductXML::product/view/renderer.phtml';
-
     private $jsonDecode;
 
     public function __construct(
@@ -67,31 +65,10 @@ class Configurable extends \Magento\Swatches\Block\Product\Renderer\Configurable
 
 
     /**
-     * Return renderer template
-     *
-     * Template for product with swatches is different from product without swatches
-     *
-     * @return string
-     */
-    protected function getRendererTemplate()
-    {
-        if( $this->hasColorHex() ) {
-            return self::COLOR_HEX_RENDERER_TEMPLATE;
-        } else {
-            if ($this->isProductHasSwatchAttribute()) {
-                return self::SWATCH_RENDERER_TEMPLATE;
-            } else {
-                return self::CONFIGURABLE_RENDERER_TEMPLATE;
-            }
-        }
-    }
-
-
-    /**
      * @param $attribute
      * @return bool
      */
-    public function hasColorHex()
+    public function hasColorName()
     {
         $product = $this->getProduct();
         if ($product->getTypeId() !== \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE) {
@@ -121,18 +98,17 @@ class Configurable extends \Magento\Swatches\Block\Product\Renderer\Configurable
         }
     }
 
+
     /**
-     * @return void
+     * override this function to launch swatch for colorName
+     * @return bool
+     * @throws \Exception
      */
-    public function getColorNames()
+    protected function isProductHasSwatchAttribute()
     {
-        $config = [];
-        $allProducts = $this->getAllowProducts();
-        foreach ($allProducts as $product) {
-            $config['name'][$product->getId()] = $product->getAttributeText(self::COLOR_NAME_CODE);
-            $config['hex'][$product->getId()] = $product->getAttributeText(self::COLOR_HEX_CODE);
-        }
-        return $this->jsonEncoder->encode($config);
+        if($this->hasColorName()) return true;
+        $swatchAttributes = ObjectManager::getInstance()->get(SwatchAttributesProvider::class)->provide($this->getProduct());
+        return count($swatchAttributes) > 0;
     }
 
     /**
@@ -143,7 +119,7 @@ class Configurable extends \Magento\Swatches\Block\Product\Renderer\Configurable
     public function getJsonSwatchConfig()
     {
         $config = $this->jsonDecode->decode(parent::getJsonSwatchConfig());
-        if( $this->hasColorHex() ) {
+        if( $this->hasColorName() ) {
             $currentProduct = $this->getProduct();
             $allowProducts = $this->getAllowProducts();
             foreach($allowProducts as $product) {
@@ -155,11 +131,6 @@ class Configurable extends \Magento\Swatches\Block\Product\Renderer\Configurable
             foreach($attributesData['attributes'][self::COLOR_NAME_ID]['options'] as $item) {
                 $config[self::COLOR_NAME_ID][$item['id']] = ['type'=>1, 'value'=>$colorValue[$item['products'][0]], 'label'=>$item['label']];
             }
-
-
-//            $config[self::COLOR_NAME_ID][255] = ['type'=>1, 'value'=>'#DBB7A9', 'label'=>'DBB7A9'];
-//            $config[self::COLOR_NAME_ID][253] = ['type'=>1, 'value'=>'#D78A89', 'label'=>'D78A89'];
-//            $config[self::COLOR_NAME_ID][251] = ['type'=>1, 'value'=>'#9B7163', 'label'=>'9B7163'];
 
             $config[self::COLOR_NAME_ID]["additional_data"] = $this->jsonEncoder->encode([
                 "update_product_preview_image" => "1",
