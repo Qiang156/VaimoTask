@@ -55,18 +55,18 @@ Since 2022-04-07
 
 ### Phase 4
 - Install Multi option filer module (ajax if its easy)
-- > - module-multi-option-filter
+- > module-multi-option-filter
 - Have a look at pagination/lazy loading
-- > - lazy loading is easy.
+- > lazy loading is easy.
 - Multiple frontends, create second frontend with only Maybelline, create website with setup script, add Maybelline products to a second 
-- > - add extra website on Admin page and modify pub/index.php to add 
-- > '''if( $_SERVER['HTTP_HOST'] == 'mb.task.test') {
-    $params['MAGE_RUN_TYPE'] = 'website';
-    $params['MAGE_RUN_CODE'] = 'mb';
-}'''
+- > add extra website on Admin page and modify pub/index.php to add 
+- > 
+  > MAGE_RUN_TYPE = 'website'
+  > MAGE_RUN_CODE'] = 'mb'
+  > 
 - Create Maybelline theme with minor changes to make them look different
 - Create some content for the different pages, use page builder and perhaps create a Carousel
-- > - to create pages for Maybelline Category
+- > to create theme for Maybelline and a home page for Maybelline website
 
 ### Phase 5
 - Laravel mock price api
