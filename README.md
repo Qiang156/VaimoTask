@@ -59,9 +59,9 @@ Since 2022-04-07
 - Have a look at pagination/lazy loading
   > lazy loading is easy.
 - Multiple frontends, create second frontend with only Maybelline, create website with setup script, add Maybelline products to a second 
-  > add Vaimo_MaybellineStoreSetup module for installing Maybelline website
-  > #make sure setting the code of Store View is maybelline, in order to using https://app.task.text/maybelline to visit it.
-  > #make sure setting "CMS Home Page" on store configuration admin page in maybelline scope
+  > - add Vaimo_MaybellineStoreSetup module for installing Maybelline website
+  > - make sure setting the code of Store View is maybelline, in order to using https://app.task.text/maybelline to visit it.
+  > - make sure setting "CMS Home Page" on store configuration admin page in maybelline scope
 - Create Maybelline theme with minor changes to make them look different
   > create Theme_VaimoMaybelline
 - Create some content for the different pages, use page builder and perhaps create a Carousel
