@@ -65,6 +65,7 @@ Since 2022-04-07
 - Magento FE asks Magento BE for price, if its not cached then it will ask Laravel and cache it.
 - When adding to cart ask for the price again (make sure it can load from cache), and update the db table quote_item
 - Stock api if you want
+> Done
 
 ### Phase 6
 - Install Akeneo locally
