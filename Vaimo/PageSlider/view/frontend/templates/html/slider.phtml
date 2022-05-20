@@ -1,0 +1,52 @@
+<?php
+/**
+ * @var \Magento\Theme\Block\Html\Header $block
+ */
+?>
+<?php
+if( $block->isHomePage() ) {
+?>
+<div id="page_slider_wrap" data-mage-init='{"Vaimo_PageSlider/js/page_slider": {}}'>
+    <div class="slider">
+        <div class="slider-img">
+            <img src="/pub/media/slider/1.jpg" width="100%" height="460" alt="轮播图1">
+        </div>
+    </div>
+
+    <div class="slider">
+        <div class="slider-img">
+            <img src="/pub/media/slider/2.jpg" width="100%" height="460" alt="轮播图2">
+        </div>
+    </div>
+
+    <div class="slider">
+        <div class="slider-img">
+            <img src="/pub/media/slider/3.jpg" width="100%" height="460" alt="轮播图3">
+        </div>
+    </div>
+
+    <div class="slider">
+        <div class="slider-img">
+            <img src="/pub/media/slider/4.jpg" width="100%" height="460" alt="轮播图4">
+        </div>
+    </div>
+
+    <div class="slider">
+        <div class="slider-img">
+            <img src="/pub/media/slider/5.jpg" width="100%" height="460" alt="轮播图5">
+        </div>
+    </div>
+
+    <div class="tab">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <div class="prev"></div>
+    <div class="next"></div>
+</div>
+<?php
+}

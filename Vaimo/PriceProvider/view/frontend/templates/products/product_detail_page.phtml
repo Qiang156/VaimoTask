@@ -1,0 +1,29 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var \Vaimo\PriceProvider\Block\PriceData $block */
+
+?>
+
+<script type="text/x-magento-init">
+    {
+        <?php
+        //for confiuration product it should be
+        ?>
+        "[data-role=swatch-options]": {
+            "Magento_Swatches/js/swatch-renderer": {
+                "jsonConfig": <?= /* @noEscape */ $block->getJsonConfig(); ?>
+            }
+        },
+        "*": {
+            "priceProvider": {
+                "type": "product",
+                "api": "<?= $block->escapeJs($block->getApiUrl('rest/V1/price-provider/prices')) ?>"
+            }
+        }
+
+    }
+</script>

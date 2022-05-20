@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!--
+  Copyright © Vaimo Group. All rights reserved.
+  See LICENSE_VAIMO.txt for license details.
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <preference for="Vaimo\PriceProvider\Api\Price\PriceFinderInterface"
+                type="Vaimo\PriceProvider\Model\Price\PriceFinder" />
+
+    <preference for="Vaimo\PriceProvider\Api\CacheInterface"
+                type="Vaimo\PriceProvider\Model\Cache" />
+
+    <preference for="Vaimo\PriceProvider\Api\Data\Price\RemoteCollectionInterface"
+                type="Vaimo\PriceProvider\Model\Data\Price\RemoteCollection" />
+    <preference for="Vaimo\PriceProvider\Api\Data\Price\PriceFinderDataInterface"
+                type="Vaimo\PriceProvider\Model\Data\Price\PriceFinderData" />
+    <preference for="Vaimo\PriceProvider\Api\Data\Price\PriceFinderItemInterface"
+                type="Vaimo\PriceProvider\Model\Data\Price\PriceFinderItem" />
+
+
+
+</config>

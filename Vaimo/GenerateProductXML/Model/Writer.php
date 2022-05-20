@@ -110,7 +110,7 @@ class Writer implements WriterInterface
 
             $attributesNode = $item->addChild('attributes','');
             $attributesNode->addAttribute('store','admin');
-            $attributesNode->addChild('color_name', trim($color_name));
+            $attributesNode->addChild('color_name', htmlspecialchars(trim($color_name)));
             $attributesNode->addChild('color_hex', $hex_value);
             $attributesNode->addChild('price', $product['price']);
         }
@@ -231,7 +231,7 @@ class Writer implements WriterInterface
                 }
                 $this->generate($xmlObj, $product);
                 $imagefile = $this->writeImage($product, $imagePath);
-                $this->writeChildImage($childSku, $imagefile);
+                if($imagefile) $this->writeChildImage($childSku, $imagefile);
                 $this->logger->addInfo(__("Write %1/%2 product with sku %3", $count++, $total, $product['sku']));
             }
             \file_put_contents($prefix . '_' . ($index+1) . '.xml', $xmlObj->asXML());
@@ -276,7 +276,7 @@ class Writer implements WriterInterface
      */
     private function writeImage(array $product, string $imagePath )
     {
-        $imageinfo = parse_url($product['images'] );
+        $imageinfo = parse_url($product['images']);
         $suffix = pathinfo($imageinfo['path'])['extension'];
         $imagefile = $imagePath.DIRECTORY_SEPARATOR.$product['sku'].'.'.$suffix;
         if( file_exists($imagefile) ) {

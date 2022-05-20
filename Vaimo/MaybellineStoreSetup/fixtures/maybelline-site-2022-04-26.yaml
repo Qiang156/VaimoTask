@@ -1,0 +1,21 @@
+websites:
+  - name: Maybelline Website
+    code: maybelline
+    sort_order: 1
+    config:
+      currency:
+        options:
+          base: EUR
+          default: EUR
+    store_groups:
+      - name: Maybelline Store
+        root_category_id: 2
+        store_views:
+          - name: Maybelline Store View
+            code: maybelline
+            is_active: 1
+            locale_code: sv_SE
+            config:
+              design:
+                head:
+                  default_title: Maybelline Store

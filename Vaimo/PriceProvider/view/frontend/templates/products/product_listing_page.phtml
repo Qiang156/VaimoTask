@@ -1,0 +1,24 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var \Vaimo\PriceProvider\Block\PriceData $block */
+
+?>
+
+<!--<div id="loader-for-price-provider"-->
+<!--     data-mage-init='{"loader": { "icon": "https://app.task.test/static/frontend/Vaimo/Task/en_US/images/loader-2.gif"}}'>-->
+<!---->
+<!--</div>-->
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "Vaimo_PriceProvider/js/call-price-provider": {
+                "type": "cateogry",
+                "api": "<?= $block->escapeJs($block->getApiUrl('rest/V1/price-provider/prices')) ?>"
+            }
+        }
+    }
+</script>
